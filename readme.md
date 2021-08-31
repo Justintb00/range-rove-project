@@ -1,0 +1,1 @@
+This is our groups term long project for our information technology 420 class @ Delaware State University
