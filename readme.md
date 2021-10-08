@@ -1,2 +1,2 @@
-<img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Delaware_State_University_logo.svg/1200px-Delaware_State_University_logo.svg.png" width="640" height="360">
+<img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Delaware_State_University_logo.svg/1200px-Delaware_State_University_logo.svg.png" width="320" height="auto">
 This is our groups term long project for our information technology 420 class @ Delaware State University
