@@ -2,29 +2,35 @@ import socket
 
 HOST = '127.0.0.1'; PORT = 25565
 
-def sendData():
+client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+
+nickname = None
+
+def recieve():
     while True:
-        data = str(input("Send the Server something... > "))
-        if data == "exit()":
+        try:
+            message = client.recv(1024).decode('utf-8')
+            if message == 'NICKNAME':
+                nickname = str(input("Enter a Nickname to Join Chat: "))
+                client.send(nickname.encode('utf-8'))
+            else:
+                print(message)
+                msg_out = str(input(f"{nickname} > "))
+                client.send(msg_out.encode('utf-8'))
+
+        except ConnectionAbortedError:
             break
-        yield data
-def client():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        s.send(bytes('I am sending you some information, server', 'utf-8'))
-        data = s.recv(1024)
-        yield data.decode('utf-8')
-        for msg in sendData():
-            msg = bytes(msg, 'utf-8')
-            s.send(msg)
-            if data:
-                print(data.decode('utf-8'))
-    s.close()
+    
+        except:
+            print("Some Error Occured")
+            break
+
+    
             
     
             
 
 
 if __name__ == '__main__':
-    for data in client():
-        print(data)
+    client.connect((HOST,PORT))
+    recieve()

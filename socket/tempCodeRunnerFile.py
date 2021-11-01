@@ -1,1 +1,0 @@
-data = bytes("Welcome to my server dudeeee", 'utf8')
