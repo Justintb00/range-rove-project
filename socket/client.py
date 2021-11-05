@@ -1,22 +1,23 @@
 import socket
+import keyboard
 
-HOST = '127.0.0.1'; PORT = 25565
+HOST = '192.168.0.225'; PORT = 25565
 
 client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 nickname = None
 
 def recieve():
+    message = client.recv(1024).decode('utf-8')
+    print(message)
     while True:
         try:
-            message = client.recv(1024).decode('utf-8')
-            if message == 'NICKNAME':
-                nickname = str(input("Enter a Nickname to Join Chat: "))
-                client.send(nickname.encode('utf-8'))
-            else:
-                print(message)
-                msg_out = str(input(f"{nickname} > "))
-                client.send(msg_out.encode('utf-8'))
+            key = keyboard.read_key()
+            if key == 'esc':
+                break
+            print(f"Key {key} sent to the server.....")
+            client.send(key.encode('utf-8'))
+            
 
         except ConnectionAbortedError:
             break
@@ -24,13 +25,20 @@ def recieve():
         except:
             print("Some Error Occured")
             break
+    print("Ending the socket connection....")
+    client.close()
 
-    
+def readKeys():
+    while True:
+        key = keyboard.read_key()
+        print(key)
             
     
             
 
 
 if __name__ == '__main__':
+    
     client.connect((HOST,PORT))
     recieve()
+    
