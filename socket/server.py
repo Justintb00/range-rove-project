@@ -1,21 +1,38 @@
 import socket
+import select
+#from sys import path; path.insert(1, '/home/pi/FreeNove/Code/Server')
+#from Motor import Motor
+
+#PWM = Motor()
 
 HOST = '127.0.0.1'
 PORT = 25565
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+
 server.bind((HOST, PORT))
 
 def handle(client):
-    valid_command = ['up', 'down', 'right', 'left', 'w', 'a', 's', 'd']
+    valid_command = ['up', 'w', 'down', 's'] # 'down', 'right', 'left', 'w', 'a', 's', 'd'
     while True:
         try:
-            command = client.recv(1024)
-            command = command.decode('utf-8')
-            print("Message Recieved from the client!")
-            if command in valid_command:
-                print(f"We moved {command}!!")
+            ready = select.select([client], [], [], .2)
+            if ready[0]:
+                command = client.recv(1024)
+                command = command.decode('utf-8')
+                print(f"{command}")
+                if command in valid_command:
+                    print("Message Recieved from the client!")
+                    if command == 'w' or command == 'up':
+                        #PWM.setMotorModel(-1000,-1000,-1000,-1000)
+                        print(f"We moved {command}!!")
+                    else:
+                        pass
+                        #PWM.setMotorModel(1000,1000,1000,1000)
+                    #PWM.setMotorModel(0,0,0,0)
+            else:
+                print("Timeout Bruv")
         except:
             break
 
@@ -30,7 +47,8 @@ def recieve():
         handle(client)
     server.close()
 
-
+def stop():
+    PWM.setMotorModel(0,0,0,0)
 
 
 

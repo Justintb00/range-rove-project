@@ -1,7 +1,7 @@
 import socket
 import keyboard
 
-HOST = '192.168.0.225'; PORT = 25565
+HOST = 'firetruck-proj'; PORT = 25565
 
 client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 

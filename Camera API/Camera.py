@@ -1,5 +1,4 @@
 import cv2
-import keyboard
 from flask import Flask, render_template, Response
 from flask_cors import CORS, cross_origin
 
@@ -16,18 +15,11 @@ def gen_frames():
         if not success:
             break
         else:
-            ret, buffer = cv2.imencode('.jpg', frame)
+            ret, buffer = cv2.imencode('.png', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                   b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
 
-def genKeyInput():
-    while True:
-        key = keyboard.read_key()
-        if key == 'esc':
-            yield "Escape Key selected, end of function"
-            break
-        yield key
 
 @app.route('/')
 def index():
@@ -37,10 +29,6 @@ def index():
 @cross_origin()
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/keys')
-def keys():
-    return Response(genKeyInput(), mimetype='text/plain')
 
 if __name__ == '__main__':
     app.run(host=host, port=port)
