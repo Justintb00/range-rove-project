@@ -41,6 +41,7 @@ def handle(client):
 def recieve():
     while True:
         client, addr = server.accept()
+        print(client)
         print(f"Connect with {addr}!")
 
         client.send("Please start pressing key inputs so I can do something with it.....\n".encode('utf-8'))

@@ -1,0 +1,35 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <form id="foo">
+            <label for="text">Enter Input you would like to send to the socket: </label>
+            <input id="input" name="text"></input><br />
+            <input type="submit"></input>
+        </form>
+        <div id="hello">
+        </div>
+        <script>
+            var client = new WebSocket("ws://localhost:8080");
+            console.log("Create Connection to WebSocket");
+            
+
+            client.onmessage = (event) => {
+                console.log("Message Recieved!");
+                out= document.getElementById("hello");
+                out.textContent = event.data;
+                console.log(event.data);
+            }
+
+            var form = document.getElementById('foo');
+            var input = document.getElementById('input');
+            form.addEventListener("submit", (e) => {
+                text = input.value;
+                client.send(text);
+                e.preventDefault();
+            })
+
+        </script>
+        
+    </body>
+</html>
