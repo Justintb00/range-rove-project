@@ -29,17 +29,14 @@ function Dev() {
     const file_handler = (event) => {
         setFile(event.target.files[0]);
         console.log("Successfully set file");
-
     }
 
     const file_submission = (event) => {
         event.preventDefault();
-        console.log("Here");
         var reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
             const img = reader.result;
-            console.log(img);
             client.send(img);
         };
     }

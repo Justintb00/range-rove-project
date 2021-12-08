@@ -1,18 +1,21 @@
 import cv2
 import mediapipe as mp
 import time
+import websockets, asyncio, json
+from time import sleep
 
 
 
 class handDetector():
-    def __init__(self, mode = False, maxHands = 2, detectionCon = 0.5, trackCon = 0.5):
+    def __init__(self, mode = False, maxHands = 2, modelComplexity=1, detectionCon = 0.5, trackCon = 0.5):
         self.mode = mode
         self.maxHands = maxHands
+        self.modelComplex = modelComplexity
         self.detectionCon = detectionCon
         self.trackCon = trackCon
 
         self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.detectionCon, self.trackCon)
+        self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplex, self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
     def findHands(self,img, draw = True):
@@ -38,40 +41,46 @@ class handDetector():
                 if draw:
                     cv2.circle(img, (cx, cy), 7, (255, 0, 255), cv2.FILLED)
         return lmlist
-def hands():
-    cap = cv2.VideoCapture(0)
-    detector = handDetector()
-    FingerTip = [4, 8, 12, 16, 20]
-    
+async def hands():
+   async with websockets.connect('ws://firetruck-proj:8080') as client:
+        cap = cv2.VideoCapture(0)
+        detector = handDetector()
+        FingerTip = [4, 8, 12, 16, 20]
+        
 
-    while cap.isOpened():
-        success, img = cap.read()
-        img = detector.findHands(img)
-        lmlist = detector.findPosition(img)
+        while cap.isOpened():
+            success, img = cap.read()
+            img = detector.findHands(img)
+            lmlist = detector.findPosition(img)
 
-        FPS = int(cap.get(cv2.CAP_PROP_FPS))
+            #print(lmlist)
+            FPS = int(cap.get(cv2.CAP_PROP_FPS))
 
 
-        if len(lmlist) != 0:
-            fingers = []
-            if lmlist[FingerTip[0]][1] > lmlist[FingerTip[0] - 1][1]:
-                fingers.append(1)
-            else:
-                fingers.append(0)
-            for i in range(1, 5):
-                if lmlist[FingerTip[i]][2] < lmlist[FingerTip[i] - 2][2]:
+            if len(lmlist) != 0:
+                fingers = []
+                if lmlist[FingerTip[0]][1] > lmlist[FingerTip[0] - 1][1]:
                     fingers.append(1)
                 else:
                     fingers.append(0)
-            print(fingers)
+                for i in range(1, 5):
+                    if lmlist[FingerTip[i]][2] < lmlist[FingerTip[i] - 2][2]:
+                        fingers.append(1)
+                    else:
+                        fingers.append(0)
+                msg = json.dumps({"message": fingers})
+                print(fingers)
+                await client.send(msg)
+                recv = await client.recv()
+                print(f'{recv}')
 
 
-        cv2.imshow("Image", img)
-        cv2.waitKey(1)
+            cv2.imshow("Image", img)
+            cv2.waitKey(1)
 
-def main():
+async def main():
 
-    hands()
+    await hands()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
