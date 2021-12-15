@@ -1,5 +1,7 @@
 import cv2
 import mediapipe as mp
+from threading import Thread
+import asyncio
 
 
 
@@ -60,3 +62,8 @@ class handDetector():
                 else:
                     fingers.append(0)
         return fingers
+    
+    async def threading(self, img):
+        val = await Thread(target=self.analyze_hand, args=(img, )).start()
+        print(val)
+        return val
